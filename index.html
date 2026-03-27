@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🏓 Mobile Carrom Board Game</title>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 10px;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .game-container {
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            background: rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        h1 {
+            color: #FFD700;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+            margin-bottom: 15px;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+        }
+        
+        canvas {
+            width: 100%;
+            max-width: 650px;
+            height: 650px;
+            max-height: 70vh;
+            border: 15px solid #8B4513;
+            border-radius: 30px;
+            background: radial-gradient(circle at center, #32CD32 30%, #228B22 60%, #006400 90%);
+            box-shadow: 
+                inset 0 0 30px rgba(0,0,0,0.4),
+                0 15px 35px rgba(0,0,0,0.5);
+            cursor: grab;
+            cursor: -webkit-grab;
+            display: block;
+            margin: 15px auto;
+            touch-action: none;
+        }
+        
+        canvas:active {
+            cursor: grabbing;
+            cursor: -webkit-grabbing;
+        }
+        
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            max-width: 450px;
+            margin: 15px auto;
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 20px;
+            font-size: clamp(1.1rem, 4vw, 1.4rem);
+            font-weight: bold;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        
+        .player-score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .status {
+            font-size: clamp(1rem, 3.5vw, 1.2rem);
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            line-height: 1.4;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(145deg, #FF6B6B, #EE5A52);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: clamp(1rem, 3vw, 1.1rem);
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(238,90,82,0.4);
+            transition: all 0.3s ease;
+            min-height: 50px;
+            touch-action: manipulation;
+        }
+        
+        button:hover, button:active {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(238,90,82,0.6);
+        }
+        
+        button:disabled {
+            background: #666;
+            transform: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: not-allowed;
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+            opacity: 0.9;
+            line-height: 1.5;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            body { padding: 5px; }
+            .game-container { padding: 15px; }
+            canvas { 
+                max-height: 60vh;
+                border-width: 12px;
+            }
+            .controls { gap: 10px; }
+            button { 
+                padding: 12px 20px;
+                flex: 1;
+                min-width: 120px;
+            }
+            .scoreboard {
+                flex-direction: column;
+                gap: 15px;
+                padding: 25px 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-container { margin: 5px; padding: 10px; }
+            h1 { margin-bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎮 Carrom Board</h1>
+        
+        <div class="scoreboard">
+            <div class="player-score">
+                <span>👨‍🦰 Player 1</span>
+                <span id="p1Score" style="font-size: 2em; color: #FFD700;">0</span>
+            </div>
+            <div class="player-score">
+                <span>👩‍🦰 Player 2</span>
+                <span id="p2Score" style="font-size: 2em; color: #FFD700;">0</span>
+            </div>
+        </div>
+
+        <div class="status">
+            <strong>Turn:</strong> <span id="currentTurn" style="color: #FFD700;">Player 1</span><br>
+            <span id="gameMsg">👆 Touch & drag gold striker to shoot!</span>
+        </div>
+
+        <canvas id="carromBoard"></canvas>
+
+        <div class="controls">
+            <button onclick="newGame()" id="newGameBtn">🔄 New Game</button>
+            <button onclick="togglePause()" id="pauseBtn">⏸️ Pause</button>
+        </div>
+
+        <div class="instructions">
+            📱 <strong>Mobile:</strong> Touch & drag striker backwards to aim<br>
+            🖱️ <strong>Desktop:</strong> Click & drag striker<br>
+            ⚽ Black/White = 1pt • 👑 Queen = 3pts • Striker pocket = turn loss
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('carromBoard');
+        const ctx = canvas.getContext('2d');
+        
+        // Responsive canvas sizing
+        function resizeCanvas() {
+            const maxSize = Math.min(window.innerWidth * 0.95, window.innerHeight * 0.65, 650);
+            canvas.width = maxSize;
+            canvas.height = maxSize;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        let centerX = canvas.width / 2;
+        let centerY = canvas.height / 2;
+        let boardRadius = canvas.width * 0.38;
+        
+        // Game state
+        let striker = {x:centerX, y:centerY, vx:0, vy:0, r:canvas.width*0.023, color:'#FFD700', pocketed:false};
+        let coins = [];
+        let pockets = [];
+        let p1Score=0, p2Score=0, currentPlayer=1, paused=false, gameOver=false;
+        let mouseX=0, mouseY=0, dragging=false, dragX=0, dragY=0;
+        let lastTime=0;
+
+        // Setup pockets
+        function setupPockets() {
+            const pocketR = canvas.width * 0.045;
+            pockets = [
+                {x:canvas.width*0.12, y:canvas.width*0.12, r:pocketR},
+                {x:canvas.width*0.88, y:canvas.width*0.12, r:pocketR},
+                {x:canvas.width*0.12, y:canvas.width*0.88, r:pocketR},
+                {x:canvas.width*0.88, y:canvas.width*0.88, r:pocketR}
+            ];
+        }
+
+        // Initialize coins
+        function initCoins() {
+            coins = [];
+            const coinR = canvas.width * 0.018;
+            
+            // 9 Black coins
+            for(let i=0; i<9; i++) {
+                let angle = i * 0.395;
+                coins.push({
+                    x: centerX + Math.cos(angle) * boardRadius * 0.28,
+                    y: centerY + Math.sin(angle) * boardRadius * 0.28,
+                    vx:0, vy:0, r:coinR, color:'#333', type:'black', pocketed:false
+                });
+            }
+            
+            // 9 White coins
+            for(let i=0; i<9; i++) {
+                let angle = i * 0.395 + 0.22;
+                coins.push({
+                    x: centerX + Math.cos(angle) * boardRadius * 0.23,
+                    y: centerY + Math.sin(angle) * boardRadius * 0.23,
+                    vx:0, vy:0, r:coinR, color:'#fff', type:'white', pocketed:false
+                });
+            }
+            
+            // Red Queen
+            coins.push({
+                x: centerX, y: centerY,
+                vx:0, vy:0, r:coinR*1.1, color:'#f44', type:'queen', pocketed:false
+            });
+        }
+
+        function draw() {
+            const cw = canvas.width, ch = canvas.height;
+            
+            // Beautiful board gradient
+            let grad = ctx.createRadialGradient(centerX,centerY,0,centerX,centerY,boardRadius*1.1);
+            grad.addColorStop(0,'#4CAF50');
+            grad.addColorStop(0.4,'#32CD32');
+            grad.addColorStop(0.7,'#228B22');
+            grad.addColorStop(1,'#006400');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0,0,cw,ch);
+
+            // Main wooden border
+            ctx.strokeStyle = '#D2691E';
+            ctx.lineWidth = canvas.width * 0.038;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.arc(centerX,centerY,boardRadius,0,Math.PI*2);
+            ctx.stroke();
+
+            // Center circle
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = canvas.width * 0.008;
+            ctx.beginPath();
+            ctx.arc(centerX,centerY,canvas.width*0.08,0,Math.PI*2);
+            ctx.stroke();
+
+            // Pockets with glow
+            pockets.forEach(p => {
+                ctx.shadowColor = '#000';
+                ctx.shadowBlur = 10;
+                ctx.fillStyle = '#111';
+                ctx.beginPath();
+                ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = '#444';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+
+            // Coins with shadows
+            coins.forEach(coin => {
+                if(!coin.pocketed) {
+                    ctx.shadowColor = 'rgba(0,0,0,0.4)';
+                    ctx.shadowBlur = 8;
+                    ctx.shadowOffsetY = 3;
+                    ctx.fillStyle = coin.color;
+                    ctx.beginPath();
+                    ctx.arc(coin.x,coin.y,coin.r,0,Math.PI*2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 1.2;
+                    ctx.stroke();
+                }
+            });
+
+            // Striker with awesome glow effect
+            ctx.shadowColor = striker.color;
+            ctx.shadowBlur = 25;
+            ctx.fillStyle = striker.color;
+            ctx.beginPath();
+            ctx.arc(striker.x,striker.y,striker.r,0,Math.PI*2);
+            ctx.fill();
+            ctx.shadowColor = '#FFD700';
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = '#FFF';
+            ctx.beginPath();
+            ctx.arc(striker.x,striker.y,striker.r*0.6,0,Math.PI*2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Aim line for dragging
+            if(dragging) {
+                ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+                ctx.lineWidth = 4;
+                ctx.setLineDash([8,8]);
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(striker.x,striker.y);
+                ctx.lineTo(mouseX,mouseY);
+                ctx.lineTo(mouseX + (mouseX-striker.x)*0.3, mouseY + (mouseY-striker.y)*0.3);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+
+        function update(delta) {
+            if(paused || gameOver) return;
+            let friction = 0.985;
+
+            // Striker physics
+            striker.x += striker.vx * delta;
+            striker.y += striker.vy * delta;
+            striker.vx *= friction;
+            striker.vy *= friction;
+
+            // Boundary collision
+            let dx = striker.x - centerX, dy = striker.y - centerY;
+            let dist = Math.hypot(dx,dy);
+            if(dist > boardRadius - striker.r) {
+                let angle = Math.atan2(dy,dx);
+                striker.x = centerX + Math.cos(angle) * (boardRadius - striker.r);
+                striker.y = centerY + Math.sin(angle) * (boardRadius - striker.r);
+                striker.vx *= -0.75;
+                striker.vy *= -0.75;
+            }
+
+            // Coin physics & collisions
+            coins.forEach(coin => {
+                if(!coin.pocketed) {
+                    coin.x += coin.vx * delta;
+                    coin.y += coin.vy * delta;
+                    coin.vx *= friction;
+                    coin.vy *= friction;
+
+                    // Coin boundary
+                    let cdx = coin.x - centerX, cdy = coin.y - centerY;
+                    let cdist = Math.hypot(cdx,cdy);
+                    if(cdist > boardRadius*0.95 - coin.r) {
+                        let angle = Math.atan2(cdy,cdx);
+                        coin.x = centerX + Math.cos(angle) * (boardRadius*0.95 - coin.r);
+                        coin.y = centerY + Math.sin(angle) * (boardRadius*0.95 - coin.r);
+                        coin.vx *= -0.82;
+                        coin.vy *= -0.82;
+                    }
+
+                    // Pocket detection
+                    pockets.forEach(pocket => {
+                        if(Math.hypot(coin.x-pocket.x, coin.y-pocket.y) < pocket.r) {
+                            coin.pocketed = true;
+                            let score = currentPlayer === 1 ? 'p1Score' : 'p2Score';
+                            window[score] += coin.type === 'queen' ? 3 : 1;
+                        }
+                    });
+                }
+            });
+
+            // Striker pocket penalty
+            pockets.forEach(pocket => {
+                if(Math.hypot(striker.x-pocket.x, striker.y-pocket.y) < pocket.r) {
+                    currentPlayer = currentPlayer === 1 ? 2 : 1;
+                    resetStriker();
+                }
+            });
+
+            // Striker-coin collisions (simplified elastic)
+            for(let i=0; i<coins.length; i++) {
+                let coin = coins[i];
+                if(!coin.pocketed) {
+                    let dx = striker.x - coin.x;
+                    let dy = striker.y - coin.y;
+                    let dist = Math.hypot(dx,dy);
+                    if(dist < striker.r + coin.r) {
+                        let angle = Math.atan2(dy,dx);
+                        let impulse = 0.15 / dist;
+                        coin.vx += Math.cos(angle) * impulse;
+                        coin.vy += Math.sin(angle) * impulse;
+                    }
+                }
+            }
+
+            // Game over check
+            if(coins.every(c => c.pocketed)) {
+                gameOver = true;
+                let winner = p1Score > p2Score ? 'Player 1' : p2Score > p1Score ? 'Player 2' : 'Draw';
+                document.getElementById('gameMsg').innerHTML = `🏆 ${winner} Wins! ${p1Score}-${p2Score}`;
+            }
+        }
+
+        function resetStriker() {
+            striker = {x:centerX, y:centerY, vx:0, vy:0, r:striker.r, color:'#FFD700', pocketed:false};
+        }
+
+        function updateUI() {
+            document.getElementById('p1Score').textContent = p1Score;
+            document.getElementById('p2Score').textContent = p2Score;
+            document.getElementById('currentTurn').textContent = `Player ${currentPlayer}`;
+            
+            let stopped = Math.hypot(striker.vx,striker.vy) < 0.3 &&
+                coins.every(c => !c.pocketed || Math.hypot(c.vx,c.v
