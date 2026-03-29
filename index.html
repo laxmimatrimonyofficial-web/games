@@ -3,377 +3,511 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>🏆 Professional Carrom Board - Full Featured</title>
+    <title>Neon Tic Tac Toe 🔥 - Mobile Edition</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;700&display=swap');
         
         * {
-            margin: 0; padding: 0; box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            user-select: none; -webkit-user-select: none;
-            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            user-select: none;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            padding: 10px;
+            align-items: center;
             overflow-x: hidden;
             position: relative;
+            touch-action: manipulation;
         }
 
+        /* Animated Background */
         body::before {
             content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 20% 80%, rgba(120,119,198,0.3) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(255,119,198,0.3) 0%, transparent 50%);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120,119,198,0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,119,198,0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120,219,255,0.2) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
             z-index: -1;
-            animation: bgShift 20s ease-in-out infinite alternate;
         }
 
-        @keyframes bgShift {
-            0% { transform: scale(1) rotate(0deg); }
-            100% { transform: scale(1.1) rotate(1deg); }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(1deg); }
         }
 
         .game-container {
-            width: 100%; max-width: 800px;
-            background: rgba(15,15,35,0.95);
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
             border-radius: 30px;
-            padding: 25px;
+            padding: 30px 20px;
             box-shadow: 
                 0 25px 50px rgba(0,0,0,0.5),
-                inset 0 1px 0 rgba(255,255,255,0.1);
+                0 0 100px rgba(120, 119, 198, 0.3),
+                inset 0 1px 0 rgba(255,255,255,0.2);
             border: 1px solid rgba(255,255,255,0.1);
+            max-width: 400px;
+            width: 95vw;
+            max-height: 95vh;
+            overflow-y: auto;
+            text-align: center;
             position: relative;
-            overflow: hidden;
+            z-index: 1;
         }
 
         .game-container::before {
             content: '';
             position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, transparent 40%, rgba(255,255,255,0.03) 50%);
-            animation: float 6s ease-in-out infinite;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, rgba(255,255,255,0.05), transparent);
+            animation: rotate 4s linear infinite;
+            z-index: 0;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translate(0,0) rotate(0deg); }
-            33% { transform: translate(30px,-30px) rotate(120deg); }
-            66% { transform: translate(-20px,20px) rotate(240deg); }
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        h1 {
+        .title {
             font-family: 'Orbitron', monospace;
-            font-size: clamp(2rem, 6vw, 3.5rem);
-            background: linear-gradient(45deg, #FFD700, #FFA500, #FF6B35);
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 900;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24);
+            background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 0 30px rgba(255,215,0,0.5);
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(255,255,255,0.5);
+            animation: gradientShift 3s ease infinite;
             letter-spacing: 2px;
         }
 
-        .scoreboard {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin: 20px 0;
-            padding: 25px;
-            background: rgba(0,0,0,0.4);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
-        .player-panel {
-            text-align: center;
-            padding: 15px;
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
-        .player-name {
-            font-size: clamp(1rem, 3vw, 1.3rem);
-            font-weight: 700;
-            margin-bottom: 10px;
-            opacity: 0.9;
+        .score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            font-weight: 600;
+            min-width: 70px;
         }
 
-        .player-active {
-            color: #00FF88 !important;
-            text-shadow: 0 0 15px #00FF88;
-            animation: pulse 2s infinite;
+        .score h3 {
+            font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+            opacity: 0.8;
+            margin-bottom: 5px;
+            font-weight: 500;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .score-display {
+        .score span {
             font-family: 'Orbitron', monospace;
-            font-size: clamp(2.5rem, 8vw, 4rem);
-            font-weight: 900;
-            background: linear-gradient(45deg, #FFD700, #FFA500);
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            font-weight: 700;
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 0 25px rgba(255,215,0,0.6);
         }
 
-        .game-status {
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 20px;
-            padding: 20px;
-            margin: 20px 0;
-            font-size: clamp(1rem, 3vw, 1.2rem);
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-
-        .status-highlight {
-            color: #00FF88;
-            font-weight: 700;
-            text-shadow: 0 0 10px #00FF88;
-        }
-
-        canvas {
-            width: 100%;
-            max-width: 700px;
-            height: 700px;
-            max-height: 70vh;
-            display: block;
-            margin: 0 auto 20px;
-            border: 20px solid transparent;
-            border-image: linear-gradient(45deg, #D2691E, #8B4513, #A0522D) 1;
-            border-radius: 35px;
-            box-shadow: 
-                inset 0 0 40px rgba(0,0,0,0.6),
-                0 20px 50px rgba(0,0,0,0.6),
-                0 0 50px rgba(255,215,0,0.2);
-            cursor: grab;
-            image-rendering: optimizeSpeed;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
-        }
-
-        canvas:active { cursor: grabbing; }
-
-        .controls {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin: 20px 0;
-        }
-
-        .btn {
-            padding: 15px 30px;
-            font-size: clamp(1rem, 2.5vw, 1.1rem);
+        .current-player {
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
             font-weight: 600;
-            border: none;
+            color: #fff;
+            text-shadow: 0 0 10px currentColor;
+            flex: 1;
+            text-align: center;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 25px 0;
+            padding: 25px;
+            background: rgba(255,255,255,0.03);
             border-radius: 25px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,0.08);
+            border: 3px solid rgba(255,255,255,0.15);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2.5rem, 18vw, 4rem);
+            font-weight: 900;
+            font-family: 'Orbitron', monospace;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
-            min-height: 55px;
-            min-width: 140px;
+            min-height: 70px;
+        }
+
+        .cell:active {
+            transform: scale(0.95);
+        }
+
+        .cell:hover:not(:active) {
+            background: rgba(255,255,255,0.18);
+            transform: scale(1.03);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .cell.x {
+            color: #ff6b6b;
+            text-shadow: 0 0 25px currentColor;
+            animation: xWin 0.6s ease-out;
+        }
+
+        .cell.o {
+            color: #4ecdc4;
+            text-shadow: 0 0 25px currentColor;
+            animation: oWin 0.6s ease-out;
+        }
+
+        @keyframes xWin {
+            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(20deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        @keyframes oWin {
+            0% { transform: scale(0) rotate(180deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(-20deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 25px;
             font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: clamp(0.85rem, 3vw, 1rem);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
             letter-spacing: 1px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(145deg, #00D4FF, #0099CC);
-            box-shadow: 0 10px 30px rgba(0,212,255,0.4);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: linear-gradient(145deg, #FF6B6B, #FF5252);
-            box-shadow: 0 10px 30px rgba(255,107,107,0.4);
-            color: white;
-        }
-
-        .btn:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            min-width: 110px;
+            touch-action: manipulation;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn:active {
-            transform: translateY(-2px) scale(1.02);
+            transform: scale(0.95);
         }
 
-        .btn:disabled {
-            background: #444;
-            transform: none;
-            cursor: not-allowed;
-            box-shadow: none;
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            box-shadow: 0 8px 20px rgba(255,107,107,0.4);
         }
 
-        .game-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            opacity: 0.8;
+        .btn-secondary {
+            background: linear-gradient(45deg, #4ecdc4, #6ee7db);
+            color: #0a0a0a;
+            box-shadow: 0 8px 20px rgba(78,205,196,0.4);
         }
 
-        .info-card {
-            background: rgba(255,255,255,0.05);
-            padding: 15px;
-            border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
-            text-align: center;
+        .btn:hover:not(:active) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
         }
 
-        @media (max-width: 768px) {
-            body { padding: 5px; }
-            .game-container { padding: 20px 15px; margin: 5px; }
-            canvas { max-height: 65vh; border-width: 15px; }
-            .controls { flex-direction: column; align-items: center; }
-            .btn { width: 100%; max-width: 280px; }
-            .scoreboard { grid-template-columns: 1fr; gap: 15px; }
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.92);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: clamp(1.5rem, 8vw, 2.5rem);
+            font-weight: 900;
+            backdrop-filter: blur(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+            z-index: 1000;
+            padding: 20px;
         }
 
-        @media (max-width: 480px) {
-            .game-container { padding: 15px 10px; }
-            h1 { font-size: 2rem; }
+        .game-over.show {
+            opacity: 1;
+            visibility: visible;
         }
 
-        .power-meter {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 200px;
-            background: rgba(0,0,0,0.7);
-            border-radius: 30px;
-            padding: 10px;
-            display: none;
+        .winner-text {
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+            text-shadow: 0 0 30px rgba(255,215,0,0.8);
+            max-width: 90%;
+            line-height: 1.2;
         }
 
-        .power-fill {
-            width: 100%;
-            height: 0%;
-            background: linear-gradient(180deg, #FF6B6B, #FFD700);
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 10px 20px;
+            font-size: 0.85rem;
             border-radius: 20px;
-            transition: height 0.1s;
-            box-shadow: 0 0 20px rgba(255,107,107,0.6);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+            color: #000;
+            box-shadow: 0 5px 15px rgba(78,205,196,0.4);
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-btn {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .difficulty-btn.active {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #000;
+            box-shadow: 0 5px 15px rgba(255,215,0,0.4);
+        }
+
+        /* Safe area for iPhone X+ */
+        @supports(padding: max(0px)) {
+            body {
+                padding-bottom: env(safe-area-inset-bottom);
+                padding-top: env(safe-area-inset-top);
+            }
+        }
+
+        /* Landscape orientation */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .game-container {
+                max-height: 100vh;
+                padding: 15px;
+            }
+            
+            .board {
+                padding: 15px;
+                gap: 8px;
+            }
+            
+            .cell {
+                min-height: 50px;
+            }
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .cell {
+                border-width: 4px;
+            }
+            
+            .btn {
+                border: 2px solid rgba(255,255,255,0.8);
+            }
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <div class="header">
-            <h1>🏓 CARROM PRO</h1>
-            <div style="font-size: 1.1rem; opacity: 0.8;">Professional Tournament Edition</div>
-        </div>
-
-        <div class="scoreboard">
-            <div class="player-panel">
-                <div class="player-name" id="p1Name">🇮🇳 Player 1</div>
-                <div class="score-display" id="p1Score">0</div>
-            </div>
-            <div class="player-panel">
-                <div class="player-name" id="p2Name">🇺🇸 Player 2</div>
-                <div class="score-display" id="p2Score">0</div>
-            </div>
-        </div>
-
-        <div class="game-status">
-            <div><strong>Current Turn:</strong> <span class="status-highlight" id="currentTurn">Player 1</span></div>
-            <div id="gameMsg">🎯 Touch & drag the <strong>GOLD STRIKER</strong> to shoot!</div>
-            <div id="multiplierMsg" style="display:none; color:#FFD700; font-weight:700;">⚡ Multiplier Active!</div>
-        </div>
-
-        <canvas id="carromBoard"></canvas>
-
-        <div class="controls">
-            <button class="btn btn-primary" onclick="newGame()">🔄 New Game</button>
-            <button class="btn btn-secondary" onclick="togglePause()" id="pauseBtn">⏸️ Pause</button>
-            <button class="btn btn-primary" onclick="toggleSound()" id="soundBtn">🔊 Sound On</button>
+        <h1 class="title">TIC TAC TOE</h1>
+        
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="2player">2 Player</button>
+            <button class="mode-btn" data-mode="vsai">vs AI</button>
         </div>
 
         <div class="game-info">
-            <div class="info-card">
-                <div style="font-size:1.2rem; color:#00FF88;">⏱️ Coins Left: <span id="coinsLeft">19</span></div>
+            <div class="score">
+                <h3>Player X</h3>
+                <span id="scoreX">0</span>
             </div>
-            <div class="info-card">
-                <div style="font-size:1.2rem; color:#FFD700;">⚡ Multiplier: <span id="multiplier">x1</span></div>
+            <div class="current-player" id="currentPlayer">Player X's Turn</div>
+            <div class="score">
+                <h3>Player O</h3>
+                <span id="scoreO">0</span>
             </div>
-            <div class="info-card">
-                <div>Total Score: <span id="totalScore" style="color:#00FF88;">0</span></div>
-            </div>
+        </div>
+
+        <div class="board" id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="newGame">New Game</button>
+            <button class="btn btn-secondary" id="resetScores">Reset</button>
+        </div>
+
+        <div class="difficulty-selector" id="difficultySelector" style="display: none;">
+            <button class="btn difficulty-btn active" data-difficulty="easy">🥚 Easy</button>
+            <button class="btn difficulty-btn" data-difficulty="medium">🐔 Medium</button>
+            <button class="btn difficulty-btn" data-difficulty="hard">🦅 Hard</button>
         </div>
     </div>
 
+    <div class="game-over" id="gameOver">
+        <div class="winner-text" id="winnerText"></div>
+        <button class="btn btn-primary" id="playAgain">Play Again</button>
+    </div>
+
     <script>
-        // Audio Context for sound effects
-        let audioCtx;
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        class MobileTicTacToe {
+            constructor() {
+                this.board = Array(9).fill(null);
+                this.currentPlayer = 'X';
+                this.gameActive = true;
+                this.scores = { X: 0, O: 0 };
+                this.gameMode = '2player';
+                this.difficulty = 'easy';
+                this.isAI = false;
+                
+                this.init();
             }
-        }
-        function playSound(frequency, duration, type='sine') {
-            initAudio();
-            let oscillator = audioCtx.createOscillator();
-            let gainNode = audioCtx.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.frequency.value = frequency;
-            oscillator.type = type;
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-            oscillator.start(audioCtx.currentTime);
-            oscillator.stop(audioCtx.currentTime + duration);
-        }
 
-        const canvas = document.getElementById('carromBoard');
-        const ctx = canvas.getContext('2d');
-        
-        // Responsive sizing
-        function resizeCanvas() {
-            const size = Math.min(window.innerWidth * 0.95, window.innerHeight * 0.65, 700);
-            canvas.width = size;
-            canvas.height = size;
-            centerX = canvas.width / 2;
-            centerY = canvas.height / 2;
-            boardRadius = canvas.width * 0.38;
-            striker.r = canvas.width * 0.022;
-            setupPockets();
-            initCoins();
-        }
+            init() {
+                this.bindEvents();
+                this.updateDisplay();
+                this.updateScores();
+                this.handleResize();
+            }
 
-        let centerX, centerY, boardRadius;
-        let striker = {x:0, y:0, vx:0, vy:0, r:0, color:'#FFD700'};
-        let coins = [];
-        let pockets = [];
-        let p1Score=0, p2Score=0, currentPlayer=1, paused=false, gameOver=false;
-        let mouseX=0, mouseY=0, dragging=false, dragStartX=0, dragStartY=0;
-        let multiplier=1, consecutivePockets=0, soundEnabled=true;
-        let lastTime=0, coinsLeft=19;
+            bindEvents() {
+                // Cell clicks with touch support
+                document.querySelectorAll('.cell').forEach(cell => {
+                    cell.addEventListener('click', (e) => this.cellClicked(e), { passive: true });
+                    cell.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        this.cellClicked(e);
+                    }, { passive: false });
+                });
 
-        function setupPockets() {
-            const pr = canvas.width * 0.045;
-            pockets = [
-                {x:centerX*0.24, y:centerX*0.24, r:pr},
-                {x:centerX*1.76, y:centerX*0.24, r:pr},
-                {x:centerX*0.24,
+                // Buttons
+                document.getElementById('newGame').addEventListener('click', () => this.newGame());
+                document.getElementById('resetScores').addEventListener('click', () => this.resetScores());
+                document.getElementById('playAgain').addEventListener('click', () => this.newGame());
+
+                // Mode selector
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.setMode(e.target.dataset.mode));
+                });
+
+                // Difficulty selector
+                document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.setDifficulty(e.target.dataset.difficulty));
+                });
+
+                // Prevent zoom on double tap
+                document.addEventListener('touchstart', function(event) {
+                    if (event.touches.length > 1) {
+                        event.preventDefault();
+                    }
+                }, { passive: false });
+
+                let lastTouchEnd = 0;
+                document.addEventListener('touchend', function(event) {
+                    const now = (new Date()).getTime();
+                    if (now - lastTouchEnd <= 300) {
+                        event.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                }, false);
+            }
+
+            cellClicked(event) {
+                const cell = event.target.closest('.cell');
+                if (!
