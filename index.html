@@ -2,347 +2,370 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Neon Tic Tac Toe 🔥</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brick Breaker Pro - Earn ₹ 💰</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;700&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Poppins', sans-serif;
-            background: #0c0c0c;
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            touch-action: none;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, sans-serif; touch-action: none; user-select: none;
         }
-
-        .game-container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 25px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            max-width: 400px;
-            width: 90vw;
-            text-align: center;
-            z-index: 1;
+        canvas {
+            border: 4px solid #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 100%; max-height: 100vh; background: #000; display: block;
         }
-
-        .title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
+        .ui {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            color: white; text-align: center; font-size: 18px; font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); z-index: 100;
         }
-
-        .game-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            color: white;
+        .top-controls {
+            position: absolute; top: 10px; right: 10px; display: flex; gap: 8px;
         }
-
-        .score span {
-            display: block;
-            font-family: 'Orbitron', monospace;
-            font-size: 1.2rem;
-            color: #4ecdc4;
-        }
-
-        .board {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .cell {
-            aspect-ratio: 1;
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-family: 'Orbitron', sans-serif;
-            color: white;
-            transition: 0.2s;
-        }
-
-        .cell.x { color: #ff6b6b; text-shadow: 0 0 15px #ff6b6b; }
-        .cell.o { color: #4ecdc4; text-shadow: 0 0 15px #4ecdc4; }
-
-        .controls, .mode-selector, .difficulty-selector {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
-
         .btn {
-            padding: 10px 15px;
-            border-radius: 20px;
-            border: none;
-            font-family: 'Orbitron', sans-serif;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: 0.3s;
+            background: linear-gradient(45deg, #ff6b6b, #feca57); border: none;
+            padding: 8px 12px; font-size: 14px; color: white; border-radius: 20px;
+            cursor: pointer; font-weight: bold; box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s; touch-action: manipulation;
         }
-
-        .btn-primary { background: #ff6b6b; color: white; }
-        .mode-btn, .difficulty-btn { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
-        .active { background: #4ecdc4 !important; color: #000 !important; }
-
-        .game-over {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
+        .btn:active { transform: scale(0.95); }
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); display: none; justify-content: center;
+            align-items: center; z-index: 1000;
         }
-
-        .game-over.show { display: flex; }
-        .winner-text { font-family: 'Orbitron'; color: white; font-size: 2rem; margin-bottom: 20px; }
+        .modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px; border-radius: 20px; text-align: center; color: white;
+            max-width: 90%; max-height: 90%; overflow-y: auto;
+        }
+        .input-group { margin: 15px 0; }
+        .input-group input {
+            width: 100%; padding: 12px; border: none; border-radius: 10px;
+            font-size: 16px; margin-top: 5px; box-sizing: border-box;
+        }
+        .rupees { color: #ffd700; font-size: 22px; font-weight: bold; }
+        .theme-btn {
+            width: 50px; height: 50px; border-radius: 50%; border: 3px solid white;
+            margin: 5px; cursor: pointer; display: inline-block;
+        }
     </style>
 </head>
 <body>
+    <div class="ui">
+        <div>Score: <span id="score">0</span> | High: <span id="highScore">0</span></div>
+        <div>Lives: <span id="lives">3</span> | Level: <span id="level">1</span></div>
+        <div class="rupees">💰 ₹<span id="wallet">0</span></div>
+    </div>
+    <div class="top-controls">
+        <button class="btn" id="pauseBtn">⏸️</button>
+        <button class="btn" onclick="showShop()">🛒</button>
+        <button class="btn" onclick="showWallet()">💰</button>
+    </div>
 
-    <div class="game-container">
-        <h1 class="title">NEON TIC TAC TOE</h1>
-        
-        <div class="mode-selector">
-            <button class="btn mode-btn active" data-mode="2player">2 Player</button>
-            <button class="btn mode-btn" data-mode="vsai">vs AI</button>
-        </div>
+    <canvas id="gameCanvas"></canvas>
 
-        <div class="difficulty-selector" id="difficultySelector" style="display: none;">
-            <button class="btn difficulty-btn active" data-difficulty="easy">Easy</button>
-            <button class="btn difficulty-btn" data-difficulty="hard">Hard</button>
-        </div>
-
-        <div class="game-info">
-            <div class="score"><h3>P1 (X)</h3><span id="scoreX">0</span></div>
-            <div id="currentPlayer">X's Turn</div>
-            <div class="score"><h3>P2 (O)</h3><span id="scoreO">0</span></div>
-        </div>
-
-        <div class="board" id="board">
-            <div class="cell" data-index="0"></div>
-            <div class="cell" data-index="1"></div>
-            <div class="cell" data-index="2"></div>
-            <div class="cell" data-index="3"></div>
-            <div class="cell" data-index="4"></div>
-            <div class="cell" data-index="5"></div>
-            <div class="cell" data-index="6"></div>
-            <div class="cell" data-index="7"></div>
-            <div class="cell" data-index="8"></div>
-        </div>
-
-        <div class="controls">
-            <button class="btn btn-primary" id="newGame">Reset Board</button>
-            <button class="btn mode-btn" id="resetScores">Clear Scores</button>
+    <!-- Start Screen -->
+    <div class="modal" id="startScreen" style="display:flex;">
+        <div class="modal-content">
+            <h1 style="margin-bottom:10px;">🏓 BRICK BREAKER PRO</h1>
+            <p>Earn ₹1 every 500 score! 💰</p>
+            <button class="btn" style="padding:15px 30px;font-size:18px;margin-top:15px;" onclick="startGame()">🚀 START EARNING</button>
         </div>
     </div>
 
-    <div class="game-over" id="gameOver">
-        <div class="winner-text" id="winnerText"></div>
-        <button class="btn btn-primary" id="playAgain">Play Again</button>
+    <!-- Game Over -->
+    <div class="modal" id="gameOver">
+        <div class="modal-content">
+            <h2 id="gameOverText">Game Over</h2>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <button class="btn" style="padding:12px 24px;" onclick="restartGame()">🔄 Play Again</button>
+        </div>
+    </div>
+
+    <!-- Shop -->
+    <div class="modal" id="shopModal">
+        <div class="modal-content">
+            <h2>🛒 GAME SHOP</h2>
+            <div style="margin:20px 0;">
+                <h3 style="margin-bottom:10px;">🎨 Themes</h3>
+                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:5px;">
+                    <div class="theme-btn" style="background:linear-gradient(135deg,#ff6b6b,#feca57)" onclick="setTheme(0)"></div>
+                    <div class="theme-btn" style="background:linear-gradient(135deg,#4ecdc4,#44a08d)" onclick="setTheme(1)"></div>
+                    <div class="theme-btn" style="background:linear-gradient(135deg,#667eea,#764ba2)" onclick="setTheme(2)"></div>
+                    <div class="theme-btn" style="background:linear-gradient(135deg,#f093fb,#f5576c)" onclick="setTheme(3)"></div>
+                </div>
+            </div>
+            <div class="input-group">
+                <h3>💖 3 Lives = ₹10</h3>
+                <button class="btn" onclick="buyLives()" style="margin-top:5px;">BUY (UPI)</button>
+            </div>
+            <button class="btn" onclick="closeShop()" style="margin-top:15px;">❌ Close</button>
+        </div>
+    </div>
+
+    <!-- Wallet -->
+    <div class="modal" id="walletModal">
+        <div class="modal-content">
+            <h2>💰 WALLET</h2>
+            <p class="rupees">₹<span id="walletBalance">0</span></p>
+            <div class="input-group">
+                <h3>📤 CASH OUT (Min ₹50)</h3>
+                <input type="text" id="upiId" placeholder="yourname@paytm" />
+                <button class="btn" onclick="cashOut()" style="margin-top:5px;">SEND TO TELEGRAM</button>
+            </div>
+            <button class="btn" onclick="closeWallet()">❌ Close</button>
+        </div>
+    </div>
+
+    <!-- Ad Modal -->
+    <div class="modal" id="adModal">
+        <div class="modal-content">
+            <h2>🎁 AD REWARD - ₹1</h2>
+            <p>Watch ad to earn ₹1!</p>
+            <button class="btn" onclick="completeAd()" style="padding:12px 24px;">✅ Completed</button>
+            <button class="btn" onclick="skipAd()" style="padding:12px 24px;">⏭️ Skip</button>
+        </div>
     </div>
 
     <script>
-        class TicTacToe {
-            constructor() {
-                this.board = Array(9).fill(null);
-                this.currentPlayer = 'X';
-                this.gameActive = true;
-                this.scores = { X: 0, O: 0 };
-                this.gameMode = '2player';
-                this.difficulty = 'easy';
-                this.winPatterns = [
-                    [0,1,2], [3,4,5], [6,7,8],
-                    [0,3,6], [1,4,7], [2,5,8],
-                    [0,4,8], [2,4,6]
-                ];
-                this.init();
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Audio
+        let audioCtx;
+        function initAudio() {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            } catch(e) {
+                console.log('Audio not supported');
             }
+        }
+        initAudio();
 
-            init() {
-                document.querySelectorAll('.cell').forEach(cell => {
-                    cell.addEventListener('click', () => this.handleMove(cell.dataset.index));
-                });
-                document.getElementById('newGame').onclick = () => this.resetBoard();
-                document.getElementById('playAgain').onclick = () => this.resetBoard();
-                document.getElementById('resetScores').onclick = () => this.clearScores();
+        function playSound(frequency, duration, type='sine', volume=0.1) {
+            if (!audioCtx) return;
+            try {
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.frequency.value = frequency;
+                oscillator.type = type;
+                gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
 
-                document.querySelectorAll('.mode-btn').forEach(btn => {
-                    btn.onclick = (e) => this.setMode(e.target);
-                });
+        // Game state
+        let gameRunning = false, gamePaused = false, score = 0, lives = 3, level = 1, wallet = 0;
+        let highScore = 0, currentTheme = 0, lastAdScore = 0;
+        const themes = [
+            {bg:'#1a1a2e', paddle:'#ff6b6b', ball:'#feca57', brickHue:20},
+            {bg:'#0f3460', paddle:'#4ecdc4', ball:'#fff', brickHue:170},
+            {bg:'#16213e', paddle:'#667eea', ball:'#ffd700', brickHue:240},
+            {bg:'#2d1b69', paddle:'#f093fb', ball:'#fff', brickHue:320}
+        ];
 
-                document.querySelectorAll('.difficulty-btn').forEach(btn => {
-                    btn.onclick = (e) => this.setDifficulty(e.target);
-                });
-            }
+        // Game objects
+        const paddle = {x:0,y:0,width:0,height:0,speed:8,targetX:0};
+        const ball = {x:0,y:0,radius:0,dx:4,dy:-4};
+        let bricks = [], particles = [];
 
-            setMode(el) {
-                this.gameMode = el.dataset.mode;
-                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-                el.classList.add('active');
-                document.getElementById('difficultySelector').style.display = this.gameMode === 'vsai' ? 'flex' : 'none';
-                this.clearScores();
-                this.resetBoard();
-            }
+        // Canvas resize
+        function resizeCanvas() {
+            const size = Math.min(window.innerWidth-20, 400, window.innerHeight-100);
+            canvas.width = size;
+            canvas.height = size;
+            initSizes();
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
 
-            setDifficulty(el) {
-                this.difficulty = el.dataset.difficulty;
-                document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
-                el.classList.add('active');
-                this.resetBoard();
-            }
+        function initSizes() {
+            paddle.x = canvas.width/2-60; paddle.y=canvas.height-30;
+            paddle.width=120; paddle.height=15; paddle.targetX=paddle.x;
+            ball.radius=8; resetBall();
+        }
 
-            handleMove(index) {
-                if (!this.gameActive || this.board[index]) return;
+        // Controls
+        canvas.addEventListener('touchstart', e=>{e.preventDefault();updateMousePos(e);});
+        canvas.addEventListener('touchmove', e=>{e.preventDefault();updateMousePos(e);});
+        canvas.addEventListener('mousedown', e=>updateMousePos(e));
+        canvas.addEventListener('mousemove', e=>updateMousePos(e));
 
-                this.makeMove(index, this.currentPlayer);
+        function updateMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const mouseX = (clientX - rect.left) * (canvas.width / rect.width);
+            paddle.targetX = Math.max(paddle.width/2, Math.min(canvas.width-paddle.width/2, mouseX-paddle.width/2));
+        }
 
-                if (this.gameActive && this.gameMode === 'vsai' && this.currentPlayer === 'O') {
-                    setTimeout(() => this.aiMove(), 400);
-                }
-            }
+        // Data
+        function loadData() {
+            try {
+                highScore = parseInt(localStorage.getItem('brickHighScore') || '0');
+                const data = JSON.parse(localStorage.getItem('brickData') || '{}');
+                wallet = data.wallet || 0;
+                currentTheme = data.theme || 0;
+            } catch(e) {}
+            updateUI();
+        }
+        function saveData() {
+            localStorage.setItem('brickHighScore', highScore);
+            localStorage.setItem('brickData', JSON.stringify({wallet, theme:currentTheme}));
+        }
+        loadData();
 
-            makeMove(index, player) {
-                this.board[index] = player;
-                const cell = document.querySelector(`[data-index="${index}"]`);
-                cell.innerText = player;
-                cell.classList.add(player.toLowerCase());
-
-                if (this.checkWin(this.board, player)) {
-                    this.endGame(player);
-                } else if (this.board.every(cell => cell !== null)) {
-                    this.endGame('Draw');
-                } else {
-                    this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
-                    document.getElementById('currentPlayer').innerText = `${this.currentPlayer}'s Turn`;
-                }
-            }
-
-            aiMove() {
-                let move;
-                if (this.difficulty === 'hard') {
-                    move = this.minimax(this.board, 'O').index;
-                } else {
-                    const available = this.board.map((v, i) => v === null ? i : null).filter(v => v !== null);
-                    move = available[Math.floor(Math.random() * available.length)];
-                }
-                this.makeMove(move, 'O');
-            }
-
-            checkWin(board, player) {
-                return this.winPatterns.some(pattern => {
-                    return pattern.every(index => board[index] === player);
-                });
-            }
-
-            minimax(newBoard, player) {
-                const availSpots = newBoard.map((v, i) => v === null ? i : null).filter(v => v !== null);
-
-                if (this.checkWin(newBoard, 'X')) return { score: -10 };
-                if (this.checkWin(newBoard, 'O')) return { score: 10 };
-                if (availSpots.length === 0) return { score: 0 };
-
-                const moves = [];
-                for (let i = 0; i < availSpots.length; i++) {
-                    const move = {};
-                    move.index = availSpots[i];
-                    newBoard[availSpots[i]] = player;
-
-                    if (player === 'O') {
-                        move.score = this.minimax(newBoard, 'X').score;
-                    } else {
-                        move.score = this.minimax(newBoard, 'O').score;
-                    }
-
-                    newBoard[availSpots[i]] = null;
-                    moves.push(move);
-                }
-
-                let bestMove;
-                if (player === 'O') {
-                    let bestScore = -10000;
-                    for (let i = 0; i < moves.length; i++) {
-                        if (moves[i].score > bestScore) {
-                            bestScore = moves[i].score;
-                            bestMove = i;
-                        }
-                    }
-                } else {
-                    let bestScore = 10000;
-                    for (let i = 0; i < moves.length; i++) {
-                        if (moves[i].score < bestScore) {
-                            bestScore = moves[i].score;
-                            bestMove = i;
-                        }
-                    }
-                }
-                return moves[bestMove];
-            }
-
-            endGame(winner) {
-                this.gameActive = false;
-                const modal = document.getElementById('gameOver');
-                const text = document.getElementById('winnerText');
-                modal.classList.add('show');
-                
-                if (winner === 'Draw') {
-                    text.innerText = "It's a Tie!";
-                } else {
-                    text.innerText = `${winner} Wins!`;
-                    this.scores[winner]++;
-                    this.updateScoreDisplay();
-                }
-            }
-
-            updateScoreDisplay() {
-                document.getElementById('scoreX').innerText = this.scores.X;
-                document.getElementById('scoreO').innerText = this.scores.O;
-            }
-
-            clearScores() {
-                this.scores = { X: 0, O: 0 };
-                this.updateScoreDisplay();
-            }
-
-            resetBoard() {
-                this.board = Array(9).fill(null);
-                this.currentPlayer = 'X';
-                this.gameActive = true;
-                document.getElementById('gameOver').classList.remove('show');
-                document.getElementById('currentPlayer').innerText = "X's Turn";
-                document.querySelectorAll('.cell').forEach(cell => {
-                    cell.innerText = '';
-                    cell.classList.remove('x', 'o');
+        function initBricks() {
+            bricks = [];
+            const rows = 5+level, cols=8;
+            const bw = canvas.width/cols*0.9, bh=25, pad=canvas.width/cols*0.05;
+            for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) {
+                bricks.push({
+                    x:pad/2+c*(bw+pad), y:50+r*(bh+5), width:bw, height:bh,
+                    color:`hsl(${themes[currentTheme].brickHue+r*20},70%,${50+r*5}%)`, broken:false
                 });
             }
         }
 
-        new TicTacToe();
-    </script>
-</body>
-</html>
+        function createParticles(x,y,color) {
+            for(let i=0;i<12;i++) particles.push({
+                x,y, vx:(Math.random()-0.5)*10, vy:(Math.random()-0.5)*10,
+                life:40, maxLife:40, color
+            });
+        }
+
+        function resetBall() {
+            ball.x=canvas.width/2; ball.y=canvas.height-50;
+            ball.dx=4*(Math.random()>0.5?1:-1); ball.dy=-4;
+        }
+
+        // UI
+        function updateUI() {
+            document.getElementById('score').textContent=score;
+            document.getElementById('highScore').textContent=highScore;
+            document.getElementById('lives').textContent=lives;
+            document.getElementById('level').textContent=level;
+            document.getElementById('wallet').textContent=wallet;
+            document.getElementById('walletBalance').textContent=wallet;
+            document.getElementById('finalScore').textContent=score;
+        }
+
+        // Game functions
+        function checkAdReward() {
+            if(score>=lastAdScore+500) {
+                lastAdScore=Math.floor(score/500)*500;
+                document.getElementById('adModal').style.display='flex';
+                gamePaused=true;
+            }
+        }
+
+        function completeAd() {
+            wallet+=1; playSound(1200,0.2); saveData(); updateUI();
+            document.getElementById('adModal').style.display='none';
+            gamePaused=false; alert('🎉 ₹1 EARNED! 💰');
+        }
+        function skipAd() {
+            document.getElementById('adModal').style.display='none';
+            gamePaused=false;
+        }
+
+        function buyLives() {
+            if(confirm('Pay ₹10 via UPI for 3 Lives?')) {
+                playSound(900,0.2); lives+=3; updateUI();
+                alert('✅ 3 Lives Added! Thanks! 🎮');
+            }
+        }
+
+        function cashOut() {
+            const upi = document.getElementById('upiId').value;
+            if(wallet<50) return alert('❌ Min ₹50 needed!');
+            if(!upi) return alert('❌ Enter UPI ID!');
+            const msg=`CASH OUT: ${upi} | ₹${wallet} | Score:${score}`;
+            console.log('TELEGRAM:',msg);
+            alert('📤 Sent to Telegram Group!\n⏳ Process in 24hrs');
+            wallet=0; saveData(); updateUI();
+        }
+
+        function setTheme(id) {
+            currentTheme=id; saveData(); alert(`🎨 Theme ${id+1} ON!`);
+        }
+
+        function showShop() { document.getElementById('shopModal').style.display='flex'; gamePaused=true; }
+        function closeShop() { document.getElementById('shopModal').style.display='none'; gamePaused=false; }
+        function showWallet() { document.getElementById('walletModal').style.display='flex'; }
+        function closeWallet() { document.getElementById('walletModal').style.display='none'; }
+        function togglePause() {
+            gamePaused = !gamePaused;
+            document.getElementById('pauseBtn').textContent = gamePaused ? '▶️' : '⏸️';
+        }
+
+        function startGame() {
+            document.getElementById('startScreen').style.display='none';
+            gameRunning=true; score=0; lives=3; level=1; lastAdScore=0;
+            initBricks(); resetBall(); updateUI();
+        }
+
+        function endGame() {
+            gameRunning=false;
+            if(score>highScore) { highScore=score; saveData(); }
+            document.getElementById('gameOver').style.display='flex';
+            document.getElementById('gameOverText').textContent=score>1000?'🏆 WINNER!':'Game Over';
+        }
+
+        function restartGame() {
+            document.getElementById('gameOver').style.display='none';
+            document.getElementById('startScreen').style.display='flex';
+        }
+
+        // Update & Draw
+        function update() {
+            if(!gameRunning || gamePaused) return;
+
+            // Paddle
+            const diff = paddle.targetX - paddle.x;
+            paddle.x += Math.abs(diff)>1 ? diff*0.2 : diff;
+
+            // Ball
+            ball.x += ball.dx; ball.y += ball.dy;
+
+            // Walls
+            if(ball.x+ball.radius>canvas.width || ball.x-ball.radius<0) { ball.dx=-ball.dx; playSound(800,0.1); }
+            if(ball.y-ball.radius<0) { ball.dy=-ball.dy; playSound(800,0.1); }
+
+            // Paddle collision
+            if(ball.y+ball.radius > paddle.y && ball.x > paddle.x && ball.x < paddle.x+paddle.width) {
+                const hit = (ball.x-(paddle.x+paddle.width/2))/(paddle.width/2);
+                ball.dx = hit*4; ball.dy = -Math.abs(ball.dy);
+                playSound(600,0.1); ball.y = paddle.y-ball.radius;
+            }
+
+            // Bottom
+            if(ball.y+ball.radius > canvas.height) {
+                lives--; playSound(200,0.3);
+                if(lives<=0) endGame();
+                else resetBall();
+                return;
+            }
+
+            // Bricks
+            bricks.forEach((brick,i) => {
+                if(!brick.broken && ball.x>brick.x && ball.x<brick.x+brick.width &&
+                   ball.y>brick.y && ball.y<brick.y+brick.height) {
+                    brick.broken=true; createParticles(brick.x+brick.width/2,brick.y+brick.height/2,brick.color);
+                    score+=10; playSound(600,0.15,'square');
+                    ball.dy=-ball.dy; checkAdReward();
+
+                    if(bricks.every(b=>b.broken)) {
+                        level++; playSound(1000,0.3); initBricks(); resetBall();
+                    }
+                }
+            });
+
+            // Particles
+            particles = particles.filter(p => {
+                p.x
